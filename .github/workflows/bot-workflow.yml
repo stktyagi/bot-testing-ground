@@ -8,7 +8,7 @@ on:
 jobs:
   changelog:
     # Call the reusable workflow from openwisp-utils
-    uses: pushpitkamboj/openwisp-utils/.github/workflows/reusable-changelog-bot.yml@tests/changelog-bot
+    uses: pushpitkamboj/openwisp-utils/.github/workflows/reusable-changelog-bot.yml@test/changelog-bot
     with:
       llm-model: "gemini-2.0-flash"
     secrets:
