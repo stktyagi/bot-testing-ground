@@ -30,7 +30,9 @@ def main():
     2. **Commit Message**: (checkcommit, conventional commits).
        - Remediation: Propose a correct commit message based on the code changes.
     3. **Test Failure**: (pytest, logic errors).
-       - Remediation: Show the specific failure trace and link to lines in the code.
+       - Remediation: Carefully compare the function logic and the test assertion. 
+       - If the function logic matches its name but the test assertion is mathematically impossible, tell the contributor to fix the test.
+       - If the function logic is wrong, tell them to fix the code.
 
     **Response Format:**
     - Start with a friendly greeting to the @contributor.
