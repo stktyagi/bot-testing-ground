@@ -1,0 +1,56 @@
+name: AI Triage Experiment
+
+on:
+  workflow_run:
+    workflows: ["CI Experiment (Fail)"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+  actions: read
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      
+      - name: Install Tools
+        run: |
+          pip install google-generativeai
+          npm install -g repomix
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: failure-evidence
+          path: .  
+
+      - name: Get PR Number
+        run: echo "PR_NUMBER=$(cat pr_number.txt)" >> $GITHUB_ENV
+
+      - name: Pack Context
+        run: repomix --include "ci_exp/**" --style xml --output repo_context.xml
+      
+      - name: Run AI
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python .github/scripts/ai_fix.py > solution.md
+
+      - name: Comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ env.PR_NUMBER }}
+        run: gh pr comment "$PR_NUM" --body-file solution.md
