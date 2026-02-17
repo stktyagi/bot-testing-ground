@@ -33,7 +33,7 @@ def main():
     """
     try:
         response = client.models.generate_content(
-            model='gemini-2.0-flash-001', 
+            model='gemini-2.5-flash-lite', 
             contents=prompt
         )
         print(f"## AI Fix\n\n{response.text}")
